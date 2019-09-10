@@ -26,8 +26,8 @@ namespace OOPsReview
     //      Auto-Implemented:
     //          a private data member DOES NOT need to be coded. the system will create an internal data member that the system will manage. 
     //          for example: a nullable non-string data value. it will be given either a numeric value or null, unless it needs additional checking such as whether or not it is positive or negative
-    public double Height { get; set; }
-    public double? Price { get; set; } //the question mark next to a datatype means that is it nullable. this is unecessary for a string which can naturally be nullable
+    public double Height {get; set;}
+    public double? Price {get; set;} //the question mark next to a datatype means that is it nullable. this is unecessary for a string which can naturally be nullable
 
     //      Fully-Implemented:
     //          a private data member WILL be coded for use by this property for additional processing such as validation. 
@@ -92,6 +92,22 @@ namespace OOPsReview
         Price = price;
         Style = style;
         //the constructor returns the instance of the object
-    } 
+    }
+
+    //-------------------------------BEHAVIOURS-------------------------------
+    //a.k.a a method
+    public double EstimatedNumberOfPanels(double linearlength)
+    {
+        double numberofpanels = linearlength / Width; //Width can be a private data member (_Width) or a property (Width)
+        return numberofpanels; //linearlength is nonexistent once method is complete
+
+        //Using a property ensures all validation or excess logic is in play
+    }
+
+    public double FenceArea(double linearlength)
+    {
+        return linearlength * Height; //not declared as private yet, so you can only use the property
+    }
+
 
 }
