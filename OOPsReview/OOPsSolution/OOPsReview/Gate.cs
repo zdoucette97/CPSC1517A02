@@ -73,7 +73,7 @@ namespace OOPsReview
             }
         }
 
-        public FencePanel(double height, double width, string style, double? price)
+        public FencePanel(double height, double width, string style, double price)
         {
             Height = height;
             Width = width;
@@ -85,6 +85,8 @@ namespace OOPsReview
         {
             return Width * Height;
         }
+
+        
     }
 
     
