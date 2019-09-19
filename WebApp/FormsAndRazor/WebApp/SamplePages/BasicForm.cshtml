@@ -1,0 +1,57 @@
+﻿@{
+    <!--the above sign places you in C# rather than html-->
+    Layout = "~/_Layout.cshtml";
+    <!--Retrieve the data entered into the input controls
+        var datatype: resolves at execution time
+        to access a control of your page you'll use: Request.Form["control parameter name"]
+        the data returned comes in as a STRING no matter what is entered-->
+    var myname = Request.Form["dataentry"];
+    var thebutton = Request.Form["theButton"];
+    <!--with two buttons, you will get the result depending on the button pressed
+        any other additional processing (e.x. database access) will be placed here and will be known troughout the whole form-->
+}
+
+@section banner {<h1>Basic Form</h1>}
+
+<!--determine if the page is a postback or not.-->
+@if (IsPost)
+{
+    //this true path is done IF this page is returning from the previous send (PostBack=true)
+    //if you had multiple buttons on your form you SHOULD determine which button was pressed; thus dictating which logic is to be EXECUTED
+    if (thebutton.Equals("PressMe"))
+    {
+        //Press Me was pressed
+        if (string.IsNullOrEmpty(myname))
+        {
+            <p>You gotta enter your name.</p>
+        }
+        else
+        {
+            <p>Howdy, myname</p>
+        }
+    }
+    else
+    {
+        //Clear was pressed
+        myname = "";
+        <p>Name cleared</p>
+    }
+}
+else
+{
+    //use to initialize items on your form BEFORE it is sent to the user for the first time (PostBack=false)
+    <p>This is the first time on this page.</p>
+}
+
+<form id="theform" method="post">
+    <label id="label1" for="dataentry">Enter your full name:</label>&nbsp;&nbsp;
+    <input type="text" id="dataentry" name="dataentry"
+           value="@myname" /> <!--void tag, no closing tag-->
+    <br /><br />
+    <button type="submit" id="PressMe" name="theButtonbb" value="pressmelovemeholdmeclose">Press Me</button>
+    &nbsp;&nbsp;
+    <input type="submit" id="PressMe" name="theButtonbb" value="Clear" />
+</form>
+
+
+
