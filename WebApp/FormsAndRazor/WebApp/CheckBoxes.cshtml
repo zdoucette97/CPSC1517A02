@@ -1,0 +1,23 @@
+﻿@{
+    Layout = "~/_Layout.cshtml";
+    Page.Title = string.Format("Razor - {0}", "Checkboxes");
+    var languagegroup = Request.Form["LanguageGroup"];
+}
+
+@section banner {<h1>Check Box Selection</h1>}
+
+<form id="theform" method="post">
+    <div class="row">
+        <div class="offset-1">
+            <label id="LanguageGrouplbl">Select your favourite programming languages:</label><br />
+            <input type="checkbox" id="LanguageGroup" name="LanguageGroup" value="C#"
+                   checked="@(languagegroup.Equals("C#")?true:false)" />C#<br /> <!--checked is for error checking to see if true or false. this is a shorter version of the same ifelse above, but only if it is a single value-->
+            <input type="checkbox" id="LanguageGroup" name="LanguageGroup" value="Python" />Python<br /><br />
+        </div>
+    </div>
+    <div class="row">
+        <div class="offset-1">
+            <button type="submit" id="theButton" name="the Button" value="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+</form>

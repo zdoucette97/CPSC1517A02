@@ -1,0 +1,55 @@
+﻿@{
+    Layout = "~/_Layout.cshtml";
+    Page.Title = string.Format("Razor - {0}", "RadioButtons");
+    var languagegroup = Request.Form["LanguageGroup"];
+    var scriptgroup = Request.Form["ScriptGroup"];
+}
+
+@section banner {<h1>Radio Button Selection</h1>}
+
+@if(IsPost)
+{
+    //this is where you process the data that was entered into your form
+    //validation: user must make a choice in each group. you are expected to read specifications for such in projects
+    //if no choice is made, the input is null. 
+    if(languagegroup.IsEmpty() || scriptgroup.IsEmpty())
+    {
+        <p><span style="color:firebrick"></span>Makes a selection in both, you moron!</p> //remember to place CSS code in CSS class. this is just example.
+    }
+    else
+    {
+        if (languagegroup.Equals("C#", StringComparison.OrdinalIgnoreCase)) //if you are not sure about capital C or small C, string comparison will help
+        {
+            <p>You will enjoy CPSC1517!</p>
+        }
+        else
+        {
+            <p>Too bad, bb. We ain't using @languagegroup</p>
+        }
+    }
+}
+else
+{
+    //place initialization code for the 1st time the page appears. you MUST have these initialized in order for (?true:false) to work, as they cannot be null
+    languagegroup = "";
+    scriptgroup = "";
+}
+
+<form id="theform" method="post">
+    <div class="row">
+        <div class="offset-1">
+            <label id="LanguageGrouplbl">Select your favourite programming language:</label><br />
+            <input type="radio" id="LanguageGroup" name="LanguageGroup" value="C#" 
+                   checked="@(languagegroup.Equals("C#")?true:false)"/>C#<br /> <!--checked is for error checking to see if true or false. this is a shorter version of the same ifelse above, but only if it is a single value--> 
+            <input type="radio" id="LanguageGroup" name="LanguageGroup" value="Python" />Python<br /><br />
+            <label id="ScriptGrouplbl">Select your favourite scripting code:</label><br />
+            <input type="radio" id="ScriptGroup" name="ScriptGroup" value="Javascript" />Javascript<br /> 
+            <input type="radio" id="ScriptGroup" name="ScriptGroup" value="Razor" />Razor<br /><br />
+        </div>
+    </div>
+    <div class="row">
+        <div class="offset-1">
+           <button type="submit" id="theButton" name="the Button" value="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+</form>
