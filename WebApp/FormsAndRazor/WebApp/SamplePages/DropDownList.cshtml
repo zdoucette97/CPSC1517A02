@@ -1,0 +1,54 @@
+﻿@{
+    Layout = "~/_Layout.cshtml";
+    Page.Title = string.Format("Razor - {0}", "Dropdown List");
+}
+
+@section banner {<h1>Dropdown List (select tag) on Form</h1>}
+
+@if (IsPost)
+{
+    var choice = Request.Form["CodingSamples"];
+    switch (choice.ToUpper()) //don't need to worry about caps
+    {
+        case "TEXTBOX":
+            {
+                //we will use the .Redirect("pagename") method of the outgoing object Response for redirection to a new page
+                //relative addressing is needed for the page
+                Response.Redirect("BasicForm.cshtml"); //page is in the same folder, so you can use a name. if not you must specifiy the file
+                break;
+            }
+        case "RADIOBUTTON":
+            {
+                Response.Redirect("RadioButtons.cshtml");
+                break;
+            }
+        case "CHECKBOX":
+            {
+                Response.Redirect("CheckBoxes.cshtml");
+                break;
+            }
+        default:
+            {
+                //if the user didn't make a selection (select... is the prompt line)
+                <p style="color:firebrick">Make a select to view the desired coding sample.</p>
+                break;
+            }
+    }
+}
+
+
+
+<form id="theform" method="post"> <!--hard coded drop down list. you can also create from a database.-->
+    <div class="row">
+        <div class="offset-1">
+            <label id="lblCodingSamples">To view coding, select your sample from the list:</label>&nbsp;&nbsp;
+            <select id="CodingSamples" name="CodingSamples">
+                <option value="">select...</option>
+                <option value="TextBox">TextBoxes</option>
+                <option value="RadioButton">RadioButtons</option>
+                <option value="CheckBox">CheckBoxes</option>
+            </select>&nbsp;&nbsp;
+            <button type="submit" id="theButton" name="the Button" value="submit" class="btn btn-primary">Go To...</button>
+        </div>
+    </div>
+</form>
