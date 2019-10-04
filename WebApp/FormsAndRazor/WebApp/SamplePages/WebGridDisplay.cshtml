@@ -1,91 +1,43 @@
 ﻿@{
-
-
     Layout = "~/_Layout.cshtml";
-    Page.Title = string.Format("Razor - {0}", "DDL Selection Query");
-    var db = Database.Open("NWDB");
-    var sqlquery = @"SELECT CategoryID, CategoryName 
-                     FROM Categories
-                     ORDER BY CategoryName";
-    var catinfo = db.Query(sqlquery);
+    Page.Title = string.Format("Razor - {0}", "WebGrid Display");
 
+    //obtain the passed data value
+    //use Request.QueryString["parameterlabel"]  (Get method)
+    //data is returned as a string
+    var cid = Request.QueryString["cid"];
+
+
+    //good practice
+    //check that a value was actually passed
+    if (string.IsNullOrEmpty(cid))
+    {
+        Response.Redirect("MultiRecordQuery.cshtml");
+    }
+
+    //get  product data
+    var db = Database.Open("NWDB");
+    var productquery = @"SELECT ProductID, ProductName, UnitPrice, UnitsInStock, Discontinued
+                FROM Products
+                WHERE CategoryID = @0
+                ORDER BY ProductName";
+    var productinfo = db.Query(productquery, cid);
+
+    //get category name
+    //could the name have been passed with the id: yes
+
+    var catnamequery = @"SELECT CategoryName
+                 FROM Categories
+                 WHERE CategoryID = @0";
+    var catname = db.QueryValue(catnamequery, cid);
+
+    //setup WebGrid instance
+    //as you create the instance of the class WebGrid, supply the collection dataset
+    var gridinstance = new WebGrid(productinfo);
+}
+@section banner{
+    <h1>WebGrid Display</h1>
 }
 
-
-@section banner {<h1>Dropdown List Selection Query</h1>}
-
-@if(IsPost)
-    {
-        //Executing Commands Reminder:
-             //There are 3 ways to execute a query DEPENDING on your expecting results
-             //a) a single row           .QuerySingle(command [, list of arguments])
-             //b) a single value         .QueryValue(command [, list of arguments])
-             //c) 0,1 or more records    .Query(command [, list of arguments])
-             //the list of arguments are your positional incoming argument values
-
-        //obtain data from the form
-        //check for selection
-        //  no:
-        //      message to user
-        //  yes:
-        //      check to see if there are products for category
-        //       no products:
-        //           message to user
-        //       yes products:
-        //           pass ddl value (CategoryID) to the next page
-
-        if() //GRAB FROM NOTES
-        {
-
-        }
-        else
-        {
-            if ()
-            {
-
-            }
-            else
-            {
-                //people use short names for their parameter labels for simplicity and privacy. e.x. cid for CategoryID. 
-                //WARNING. values are passed in PLAIN TEXT. 
-                //e.x. Response.Redirect("WebGridDisplay.cshtml?cid=" + choice + "&lbl2=" + value2)
-
-                //Webgrid; DANGER. Get method, not for secure data. e.x. change the parameters such as date. 
-            }
-        }
-
-    }
-    else
-    {
-        //On page initialization
-        //.Count() testing for an empty collection
-        //.Query() output is a collection of 0,1, or more records 
-        if(catinfo.Count() == 0)
-        {
-        <p style="color:blueviolet">There are no categories one file.</p>
-        }
-    }
-
-<form id="theform" method="post">
-    <div class="offset-3">
-        <label id="lblCategoryList" for="CategoryList">Select product query to view:</label><!--category list is good for semantic tags or formatting for form groups to simplify automation-->
-        &nbsp;&nbsp;
-        <select id="CategoryList" name="CategoryList">
-            <option value="0">select...</option> <!--default to 0 to ensure it is a numeric value-->
-            @foreach(var item in catinfo)
-            {
-                //walk through (traverse) the record collection of Category records.
-                //for each record in the collection you will create an option line
-                //display text is the CategoryName, not the CategoryID, which is a useless number to the user
-                //value attribute is the CategoryID (FKey on Products)
-                //reminder of data access on record
-                //a) index          (item[index])
-                //b)property name   (item.PropertyName [column title on sqlselect]
-
-                <option value="item.CategoryID">@item.CategoryName</option>
-            }
-        </select>
-        &nbsp;&nbsp;
-        <button type="submit" id="theButton" name="the Button" value="submit" class="btn btn-primary">View Category Products</button>&nbsp;&nbsp;
-    </div>
-</form>
+<p style="font-size:x-large; color:green">Products for Category: @catname</p>
+@gridinstance.GetHtml()

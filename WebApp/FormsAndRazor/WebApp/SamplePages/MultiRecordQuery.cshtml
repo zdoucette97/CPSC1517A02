@@ -1,0 +1,112 @@
+﻿@{
+
+
+    Layout = "~/_Layout.cshtml";
+    Page.Title = string.Format("Razor - {0}", "DDL Selection Query");
+    var db = Database.Open("NWDB");
+    var sqlquery = @"SELECT CategoryID, CategoryName
+             FROM Categories
+             ORDER BY CategoryName";
+    var catinfo = db.Query(sqlquery);
+
+}
+
+
+@section banner {<h1>Dropdown List Selection Query</h1>}
+
+@if (IsPost)
+{
+    //Executing Commands Reminder:
+    //There are 3 ways to execute a query DEPENDING on your expecting results
+    //a) a single row           .QuerySingle(command [, list of arguments])
+    //b) a single value         .QueryValue(command [, list of arguments])
+    //c) 0,1 or more records    .Query(command [, list of arguments])
+    //the list of arguments are your positional incoming argument values
+
+    //obtain data from the form
+    //check for selection
+    //  no:
+    //      message to user
+    //  yes:
+    //      check to see if there are products for category
+    //       no products:
+    //           message to user
+    //       yes products:
+    //           pass ddl value (CategoryID) to the next page
+
+    //people use short names for their parameter labels for simplicity and privacy. e.x. cid for CategoryID.
+    //WARNING. values are passed in PLAIN TEXT.
+    //e.x. Response.Redirect("WebGridDisplay.cshtml?cid=" + choice + "&lbl2=" + value2)
+
+    //Webgrid; DANGER. Get method, not for secure data. e.x. change the parameters such as date.
+    //obtain the selected choice
+    var choice = Request.Form["CategoryList"];
+
+    //is the choice the prompt?
+    if (choice.Equals("0"))
+    {
+        //   yes: message to user
+        <p style="color:darkslateblue">Select a choice from the list to view the category projects.</p>
+    }
+    else
+    {
+        //   no:
+        //  create a query to search the Products for records with categoryid choice
+        var productquery = @"SELECT ProductID
+                            FROM Products
+                            WHERE CategoryID = @0";
+        var productinfo = db.Query(productquery, choice);
+        //       check if there are no products for the category
+        if (productinfo.Count() == 0)
+        {
+            //          yes:  message to user
+            <p style="color:darkslateblue">There are no products for your selected category.</p>
+        }
+        else
+        {
+            //           no: pass selected value to next page
+            //passing data via the Url is known as a Get method
+            //data is displayed as plain text in the Url
+            //the data argument is in a label=value pair
+            //data arguments follow the pagename and ?
+            //data arguments are separated by the & symbol
+            //syntax   pagename.cshtml?label=value[&label=value...]
+            //use the Response.Redirect to goto another page
+            Response.Redirect("WebGridDisplay.cshtml?cid=" + choice);
+        }
+    }
+}
+else
+{
+    //On page initialization
+    //.Count() testing for an empty collection
+    //.Query() output is a collection of 0,1, or more records
+    if (catinfo.Count() == 0)
+    {
+        <p style="color:blueviolet">There are no categories one file.</p>
+    }
+}
+
+<form id="theform" method="post">
+    <div class="offset-3">
+        <label id="lblCategoryList" for="CategoryList">Select product query to view:</label><!--category list is good for semantic tags or formatting for form groups to simplify automation-->
+        &nbsp;&nbsp;
+        <select id="CategoryList" name="CategoryList">
+            <option value="0">select...</option> <!--default to 0 to ensure it is a numeric value-->
+            @foreach (var item in catinfo)
+            {
+                //walk through (traverse) the record collection of Category records.
+                //for each record in the collection you will create an option line
+                //display text is the CategoryName, not the CategoryID, which is a useless number to the user
+                //value attribute is the CategoryID (FKey on Products)
+                //reminder of data access on record
+                //a) index          (item[index])
+                //b)property name   (item.PropertyName [column title on sqlselect]
+
+                <option value="item.CategoryID">@item.CategoryName</option>
+            }
+        </select>
+        &nbsp;&nbsp;
+        <button type="submit" id="theButton" name="the Button" value="submit" class="btn btn-primary">View Category Products</button>&nbsp;&nbsp;
+    </div>
+</form>
