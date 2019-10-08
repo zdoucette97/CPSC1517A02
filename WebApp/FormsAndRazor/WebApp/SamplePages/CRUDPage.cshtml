@@ -15,13 +15,47 @@
     //obtain two lists: SupplierList and CategoryList
     var db = Database.Open("NWDB");
     var supplierquery = @"SELECT SupplierID, CompanyName
-  FROM Suppliers
-  Order by CompanyName";
+FROM Suppliers
+Order by CompanyName";
     var categoryquery = @"SELECT CategoryID, CategoryName
-  FROM Categories
-  Order by CategoryName";
+FROM Categories
+Order by CategoryName";
     var supplierlist = db.Query(supplierquery);
     var categorylist = db.Query(categoryquery);
+
+    //validator controls to execute on the server side
+    Validation.Add("ProductName",
+        Validator.Required("Product name is required"),
+        Validator.StringLength(160, 1, "Product name cannot be more than 160 characters."));
+
+    Validation.Add("QuantityPerUnit",
+        Validator.StringLength(40, 0, "QuantityP per unit cannot be more than 40 characters.")); //0 is required as the minimum for a nullable value
+
+    Validation.Add("UnitPrice",
+        Validator.Decimal("Unit price is a money field."),
+        Validator.Range(0.00, double.MaxValue, "Unit price must be $0.00 or more."));
+
+    Validation.Add("UnitInStock",
+        Validator.Integer("Units in stock must be a number."),
+        Validator.Range(0, 32767.0, "Units in stock must be between 0.00 or 32767.")); //32767 is maximum for small integer. Bigint is a larger maximum
+
+    Validation.Add("UnitsOnOrder",
+        Validator.Decimal("Units on order must be a number."),
+        Validator.Range(0, 32767.0, "Units on order must be between 0.00 or 32767."));
+
+    Validation.Add("ReorderLevel",
+        Validator.Decimal("Reorder Level must be a number."),
+        Validator.Range(0, 32767.0, "Reorder Level must be between 0.00 or 32767."));
+
+    //compare two fields together (i.e. password)
+    //Validation.Add("ConfirmPassword",
+    //    Validator.Required("A password confirmation is required."),
+    //    Validator.StringLength(160, 1, "Password confirmation is too long.")
+    //    Validator.EqualsTo("Password", "Password not confirmed."));
+
+    //Pattern testing (i.e. Postal Code)
+    Validation.Add("PostalCode",
+        Validator.Regex(@"", "Postal Code format invalid (T7T7T7)")); //you know the format eh?
 
 }
 
@@ -34,6 +68,11 @@
 
     // retrieve the data from the form
     productname = Request.Form["ProductName"];
+
+    //here is an example of testing server side data, like a hacker hijacking the data. assume a hacker changed the data:
+    productname = "";
+
+
     supplierid = Request.Form["SupplierList"];
     categoryid = Request.Form["CategoryList"];
     quantityperunit = Request.Form["QuantityPerUnit"];
@@ -49,7 +88,7 @@
         //empty the form fields
         productname = "";
         supplierid = "";
-        categoryid = "";
+        categoryid = ""; //another area that has to be fixed. if it is 0 in another area LOOK AT NOTES
         quantityperunit = "";
         unitprice = "";
         unitsinstock = "";
@@ -59,45 +98,66 @@
     else
     {
         //Validation of data
-
-        //check validation result
-
-        //good data
-        try
+        //Validation.IsValid() is used to execute the server side validation.
+        //if the statement DOES NOT need an else as the validation control 
+        //  the message will appear in your Summary() or Message() controls
+        if (Validation.IsValid())
         {
-            //connect to the database
-            //done above
-            //create sql command
-            var inscommand = @"INSERT INTO Products (ProductName, SupplierID, CategoryID, QuantityPerUnit, UnitPrice, UnitsInStock, UnitsOnOrder, ReorderLevel, Discontinued)
-                    VALUES(@0, @1, @2, @3, @4, @5, @6, @7, 0)";
-            //execute the command
-            db.Execute(inscommand, productname,
-                        string.IsNullOrEmpty(supplierid) ? null : supplierid,
-                        string.IsNullOrEmpty(categoryid) ? null : categoryid,
-                        string.IsNullOrEmpty(quantityperunit) ? null : quantityperunit,
-                        string.IsNullOrEmpty(unitprice) ? null : unitprice,
-                        string.IsNullOrEmpty(unitsinstock) ? null : unitsinstock,
-                        string.IsNullOrEmpty(unitsonorder) ? null : unitsonorder,
-                        string.IsNullOrEmpty(reorderlevel) ? null : reorderlevel); //these fields are nullable. a localized test to be sure if they are null or not
-                                                                                   //Discontinued is not gathered, but you better be sure they aren't true
-            <div class="col-12 text-center">
-                <p style="color:green">Product has been added</p>
-            </div>
+
+            //you may have logical validation needed for your data needed for your data that cannot be accomplished by Validation Controls or HTML5
+            //this type of validation is a programmed validation. For example:
+            //Assume the categoryID is a required field (in reality in the table it is nulllable)
+            
+            //AYYYDYYFYFYFYY GO TO THE NOTES TO FIX THIS YOU GOT LOST YOU DINGUS
+
+            //check validation result
+            //good data
+
+            try
+            {
+                //connect to the database
+                //done above
+                //create sql command
+                var inscommand = @"INSERT INTO Products (ProductName, SupplierID, CategoryID, QuantityPerUnit, UnitPrice, UnitsInStock, UnitsOnOrder, ReorderLevel, Discontinued)
+                                    VALUES(@0, @1, @2, @3, @4, @5, @6, @7, 0)";
+                //execute the command
+                db.Execute(inscommand, productname,
+                            string.IsNullOrEmpty(supplierid) ? null : supplierid,
+                            string.IsNullOrEmpty(categoryid) ? null : categoryid,
+                            string.IsNullOrEmpty(quantityperunit) ? null : quantityperunit,
+                            string.IsNullOrEmpty(unitprice) ? null : unitprice,
+                            string.IsNullOrEmpty(unitsinstock) ? null : unitsinstock,
+                            string.IsNullOrEmpty(unitsonorder) ? null : unitsonorder,
+                            string.IsNullOrEmpty(reorderlevel) ? null : reorderlevel); //these fields are nullable. a localized test to be sure if they are null or not
+                                                                                       //Discontinued is not gathered, but you better be sure they aren't true
+                <div class="col-12 text-center">
+                    <p style="color:green">Product has been added</p>
+                </div>
+            }
+            catch (Exception ex)
+            {
+                <div class="col-12 text-center">
+                    <p style="color:firebrick; font-size:large">Processing error: @ex.Message</p>
+                </div>
+            }
         }
-        catch (Exception ex)
-        {
-            <div class="col-12 text-center">
-                <p style="color:firebrick; font-size:large">Processing error: @ex.Message</p>
-            </div>
-        }
+
+        
     }
 
 }
 else
 {
+    @* there are two ways to display your validation errors.
+        a) using the ValidationSummary()
+            - bulleted list of all errors in all fields
+        b) using the ValidationMessage()
+            - placed beside the actual control field
+            - display only the 1st error of the field*@
 
 }
 
+@Html.ValidationSummary()
 <form id="theform" method="post">
     <div class="row">
         <div class="col-md-6 text-right">
@@ -115,16 +175,19 @@ else
         </div>
         <div class="col-me-6 text-left">
 
-            <input type="text"
+            <input type="text" value=" @productname"
                    id="ProductName" name="ProductName" />
+            <!--Here is where you place client side validation-->
+
+            @Html.ValidationMessage("ProductName");
             <br />
             <select id="SupplierList" name="SupplierList">
                 <option value="0">select supplier...</option>
                 @foreach (var item in supplierlist)
                 {
-                    //for the select control, the default display on an event 
+                    //for the select control, the default display on an event
                     //      is the 1st option tag
-                    //to retain the option selected between posts, you need to 
+                    //to retain the option selected between posts, you need to
                     //      set the selected option using the attribute selected
                     if (supplierid == item.SupplierID.ToString())
                     {
@@ -139,7 +202,7 @@ else
             </select>
             <br />
             <select id="CategoryList" name="CategoryList">
-                <option value="0">select category...</option>
+                <option value="0">select category...</option> <!--FIX the value-->
                 @foreach (var item in categorylist)
                 {
                     <option value="@item.CategoryID">@item.CategoryName</option>
@@ -147,12 +210,12 @@ else
             </select>
             <br />
             <!--some companies have no physical inventory.
-                e.x. amazon only packages items, but do not have it on order from the business
-                reorderlevel is a value which calculates what you need to reorder based on uins and uono-->
+            e.x. amazon only packages items, but do not have it on order from the business
+            reorderlevel is a value which calculates what you need to reorder based on uins and uono-->
             <input type="text" id="QuantityPerUnit" name="QuantityPerUnit"
                    value="@quantityperunit" /><br />
             <input type="text" id="UnitPrice" name="UnitPrice"
-                   value="@unitprice" /><br />
+                   value="@unitprice" min="0.00" max="9999999.0" step="0.01" /><br /> <!--Client side validation-->
             <input type="text" id="UnitsInStock" name="UnitsInStock"
                    value="@unitsinstock" /><br />
             <input type="text" id="UnitsOnOrder" name="UnitsOnOrder"
