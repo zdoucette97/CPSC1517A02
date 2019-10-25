@@ -49,13 +49,26 @@
                     <a class="navbar-brand" runat="server" href="~/">Application name</a>
                 </div>
                 <div class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
+                <%--this was the given default menu when the webapp was first created--%>
+                    <%--<ul class="nav navbar-nav">
                         <li><a runat="server" href="~/">Home</a></li>
                         <li><a runat="server" href="SamplePages/HelloWorld.aspx">SamplePages/HelloWorld.aspx</a></li>
                         <li><a runat="server" href="~/About">About</a></li>
                         <li><a runat="server" href="~/Contact">Contact</a></li>
-                    </ul>
-                </div>
+                    </ul>--%>
+
+                <%--Replace the given default menu with a Manu.aspx control which will reference a SiteMapDataSource control which point to the actual menu located in a .sitemapfile--%>
+                    <asp:Menu ID="BasicAspNetMenu" runat="server"
+                         DataSourceID="BasicAspNetMenuDS"  Orientation="Horizontal"
+                         StaticDisplayLevels="1"
+                         StaticMenuStyle-CssClass="nav nav-bar"
+                         StaticSelectedStyle-CssClass="active"
+                         DynamicMenuStyle-CssClass="dropdown-menu"
+                         IncludeStyleBlock="false"
+                         EnableViewState="false"></asp:Menu>
+                    <asp:SiteMapDataSource ID="BasicAspNetMenuDS" runat="server" 
+                         ShowStartingNode="false"/> <%--press spacebar to activate intellisense.--%>
+                </div>                
             </div>
         </div>
         <div class="container body-content">
