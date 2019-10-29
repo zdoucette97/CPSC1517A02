@@ -64,7 +64,7 @@ namespace WebApp.SamplePages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList ProgrammingCourseActive;
+        protected global::System.Web.UI.WebControls.CheckBox ProgrammingCourseActive;
         
         /// <summary>
         /// Label2 control.
