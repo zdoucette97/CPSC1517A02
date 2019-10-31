@@ -26,7 +26,37 @@ namespace WebApp.SamplePages
 
         protected void Submit_Click(object sender, EventArgs e)
         {
-            Message.Text = "You pressed the submit button.";
+            //gather the entered data 
+            string fullname = FullName.Text;
+            string email = EmailAddress.Text;
+            string phonenumber = PhoneNumber.Text;
+            string time = FullOrPartTime.SelectedValue;
+            
+            //create a message string containing the data
+            string msg = string.Format("Name: {0} Email: {1} Phone: {2} Time: {3}",
+                                        fullname, email, phonenumber, time);
+
+            //to handle the checkbox list, traverse the list and obtain the data that was selected
+            //after the traverse, add the string of jobs OR an error message to the other message data string
+            string jobs = " Jobs: ";
+            bool found = false;
+            foreach(ListItem placeholderitem in Jobs.Items)
+            {
+                if(placeholderitem.Selected)
+                {
+                    found = true;
+                    jobs += placeholderitem.Value + " ";
+
+                }
+
+            }
+            if (!found)
+            {
+                jobs += " you did not select a job. Application rejected.";
+            }
+
+            //display the message string in the output message control 
+            Message.Text = msg + jobs;
         }
     }
 }
