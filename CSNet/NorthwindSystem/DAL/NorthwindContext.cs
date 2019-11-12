@@ -16,22 +16,27 @@ namespace NorthwindSystem.DAL
 
     //this class needs to be "tied" into EntityFramework
     //this will be done by inheriting the class DbContext
-    internal class NorthwindContext:DbContext
+    internal class NorthwindContext : DbContext
     {
+        public NorthwindContext() : base("NWDB")
+        {
+
+        }
         //this class needs to supply DbContet within the applicatons's connection string name
         //this name is supplied to DbContext using the constructor of this class
+
+
+
+        //we need properties in this class that will be used by
+        //  EntityFramework to transport the data into/out of your application
+        //each entity will have their own "transportation set" 
+
+        //the coding standard for thsi course will be plural naming for the 
+        //  DbSet<T> property name
+
+        public DbSet<Product> Products { get; set; }
+
+        public DbSet<Region> Regions { get; set; }
+
     }
-
-    //we need properties in this class that will be used by
-    //  EntityFramework to transport the data into/out of your application
-    //each entity will have their own "transportation set" 
-
-    //the coding standard for thsi course will be plural naming for the 
-    //  DbSet<T> property name
-
-    public DbSet<Product> Products { get; set;}
-
-    public DbSet<Region> Regions { get; set; }
-
-
 }
