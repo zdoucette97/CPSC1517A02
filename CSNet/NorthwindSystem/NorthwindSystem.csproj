@@ -56,6 +56,7 @@
     <Compile Include="BLL\RegionController.cs" />
     <Compile Include="DAL\NorthwindContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SupplierController.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NorthwindSystem.Data\NorthwindSystem.Data.csproj">

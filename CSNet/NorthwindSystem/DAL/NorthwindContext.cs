@@ -40,5 +40,7 @@ namespace NorthwindSystem.DAL
 
         public DbSet<Region> Categories { get; set; }
 
+        public DbSet<Supplier> Suppliers { get; set; }
+
     }
 }
