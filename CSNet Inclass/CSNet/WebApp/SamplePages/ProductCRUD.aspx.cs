@@ -135,6 +135,93 @@ namespace WebApp.NorthwindPages
 
         #endregion
 
+        protected void Clear_Click(object sender, EventArgs e)
+        {
+            ProductID.Text = "";
+            ProductName.Text = "";
+            QuantityPerUnit.Text = "";
+            UnitPrice.Text = "";
+            UnitsInStock.Text = "";
+            UnitsOnOrder.Text = "";
+            ReorderLevel.Text = "";
+            ProductList.SelectedIndex = 0;
+            CategoryList.SelectedIndex = 0;
+            SupplierList.SelectedIndex = 0;
+            Discontinued.Checked = false;
+        }
+
+        protected void Search_Click(object sender, EventArgs e)
+        {
+            if (ProductList.SelectedIndex == 0)
+            {
+                errormsgs.Add("Select a product to maintain.");
+                LoadMessageDisplay(errormsgs, "alert alert-info");
+            }
+            else
+            {
+                //standrd lookup
+                try
+                {
+                    ProductController sysmgr = new ProductController();
+                    Product info = null;
+                    info = sysmgr.Products_FindByID(int.Parse(ProductList.SelectedValue));
+                    
+                    if (info == null)
+                    {
+                        errormsgs.Add("No longer on file.");
+                        LoadMessageDisplay(errormsgs, "alert alert-info");
+
+                        //optionally you can refresh your page to clear the fields
+                        Clear_Click(sender, e);
+                        //and then reload the binding of the product list
+                        BindProductList();
+
+                    }
+                    else
+                    {
+                        ProductID.Text = info.ProductID.ToString();
+                        ProductName.Text = info.ProductName.ToString();
+                        QuantityPerUnit.Text =
+                            info.QuantityPerUnit == null? "" : info.QuantityPerUnit; //nullable field
+                        UnitPrice.Text =
+                            info.UnitPrice.HasValue ? string.Format("{0:0.00}", info.UnitPrice.Value) : ""; // nullable numeric field formatted
+                        UnitsInStock.Text =
+                            info.UnitsInStock.HasValue ? info.UnitsInStock.Value.ToString() : ""; // nullable numeric field
+                        UnitsOnOrder.Text =
+                            info.UnitsOnOrder.HasValue ? info.UnitsOnOrder.Value.ToString() : ""; 
+                        ReorderLevel.Text =
+                            info.ReorderLevel.HasValue ? info.ReorderLevel.Value.ToString() : ""; 
+                        Discontinued.Checked = info.Discontinued;
+
+                        if(info.CategoryID.HasValue)
+                        {
+                            CategoryList.SelectedValue = info.CategoryID.Value.ToString();
+                        }
+                        else
+                        {
+                            CategoryList.SelectedIndex = 0; //set to the "select..."
+                        }
+
+                        if (info.SupplierID.HasValue)
+                        {
+                            SupplierList.SelectedValue = info.SupplierID.Value.ToString();
+                        }
+                        else
+                        {
+                            SupplierList.SelectedIndex = 0; //set to the "select..."
+                        }
+                    }
+                    
+
+
+                }
+                catch (Exception ex)
+                {
+                    errormsgs.Add(GetInnerException(ex).ToString());
+                    LoadMessageDisplay(errormsgs, "alert alert-danger");
+                }
+            }
+        }
     }
 
 }

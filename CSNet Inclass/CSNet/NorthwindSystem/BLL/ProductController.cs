@@ -53,5 +53,35 @@ namespace NorthwindSystem.BLL
                 return context.Products.Find(productid);
             }
         }
+
+        public int Products_Add(Product item)
+        {
+            //at some point in time your individual product fields must be placed in an instance of the class
+            //this can be done on the webpage or within this method
+
+            //using clause starts with a transaction with ends with a rollback or a commit
+            using (var context = new NorthwindContext())
+            {
+                //1)Stage the data for the execution by the commit statement.
+                //  Staging is done in local memory
+                //  Stagin DOES NOT create an identity value; this is done at the commit
+
+                context.Products.Add(item);
+
+                //2)Commit your staged record to the database
+                //  If the commiting command is successful, then the new identity value WILL exist in your data instance
+                //  If the committing command is NOT successful, the transaction is rolled back
+
+                context.SaveChanges();
+
+                //optionally
+                //you may decide to return the new identity value to the web page
+                //  if you decide to return the value then the method has a return data type of int,
+                //  else the method should be using a return data type of void
+                //SINCE the commit command worked (if you are executing this statement) you will find the identity value in your instance
+
+                return item.ProductID;
+            }
+        }
     }
 }
