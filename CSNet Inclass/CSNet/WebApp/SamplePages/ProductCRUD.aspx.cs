@@ -8,6 +8,10 @@ using System.Web.UI.WebControls;
 #region Additional Namespaces
 using NorthwindSystem.BLL;
 using NorthwindSystem.Data;
+using System.Data.Entity.Validation;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Core;
+
 #endregion
 
 namespace WebApp.NorthwindPages
@@ -220,7 +224,279 @@ namespace WebApp.NorthwindPages
                     errormsgs.Add(GetInnerException(ex).ToString());
                     LoadMessageDisplay(errormsgs, "alert alert-danger");
                 }
+
             }
+        }
+
+        protected void AddProduct_Click(object sender, EventArgs e)
+        {
+            //recheck validation
+            if(Page.IsValid)
+            {
+                //check any event code validation
+
+                try
+                { 
+                    //examples:
+                    //e.x.1 assume that the category ID is required
+                    if (CategoryList.SelectedIndex == 0) //still on prompt
+                    {
+                        errormsgs.Add("No category selected.");
+                    }
+                    //e.x.2 check the string length of QuantityPerUnit
+                    if (QuantityPerUnit.Text.Length > 20)
+                    {
+                        errormsgs.Add("QuantityPerUnit is limited to 20 characters.");
+                    }
+                    //      Is data still good?
+                    if (errormsgs.Count > 0)
+                    {
+                        LoadMessageDisplay(errormsgs, "alert alert-info");
+                    }
+                    else
+                    {
+                        //assume at this point, the data is good! you are ready for processing
+
+                        //Standard Add Pattern:
+                        //1) connect to the controller
+                        ProductController sysmgr = new ProductController();
+
+                        //2) create and load an instance of the entity
+                        //      since there was no constructor placed in the entity, 
+                        //      when one creates the instance the default system constructor will be used
+                        Product item = new Product();
+                        //  NOTE: item name isn't important, can be anything
+                        //  NOTE: since the ProductID is an identity field it does NOT need to be loaded into the new instance
+                        item.ProductName = ProductName.Text.Trim();
+                        //      trim removes accidental spaces
+                        //  E.X. the long way of dealing with nullable numerics
+                        if (CategoryList.SelectedIndex == 0)
+                        {
+                            item.CategoryID = null;
+                        }
+                        else
+                        {
+                            item.CategoryID = int.Parse(CategoryList.SelectedValue);
+                        }
+                        
+                        //  E.X. the short way of dealing with nullable numerics
+                        item.SupplierID =
+                            SupplierList.SelectedIndex == 0 ? (int?)null : int.Parse(SupplierList.SelectedValue);
+                        item.QuantityPerUnit =
+                            string.IsNullOrEmpty(QuantityPerUnit.Text) ? null : QuantityPerUnit.Text;
+                        item.UnitPrice =
+                            string.IsNullOrEmpty(UnitPrice.Text) ? (decimal?)null : decimal.Parse(UnitPrice.Text);
+                        item.UnitsInStock =
+                            string.IsNullOrEmpty(UnitsInStock.Text) ? (Int16?)null : Int16.Parse(UnitsInStock.Text);
+                        item.UnitsOnOrder =
+                            string.IsNullOrEmpty(UnitsOnOrder.Text) ? (Int16?)null : Int16.Parse(UnitsOnOrder.Text);
+                        item.ReorderLevel =
+                            string.IsNullOrEmpty(ReorderLevel.Text) ? (Int16?)null : Int16.Parse(ReorderLevel.Text);
+                        //just added; can't be discontinued
+                        item.Discontinued = false;
+
+                        //3) issue the BLL call 
+                        int newProductID = sysmgr.Products_Add(item);
+
+                        //4) give feedback
+                        //      if you get to execute the feedback code, it means that the product has been sucessfully added to  the db
+                        ProductID.Text = newProductID.ToString();
+                        errormsgs.Add("Product has been added.");
+                        LoadMessageDisplay(errormsgs, "alert alert-danger");
+                        //      is there any other controls on the form that need to be refreshed?
+                        //      you want the new product item to be added to the list!
+                        BindProductList();
+                        //  NOTE: by default, List will be at index 0 (the prompt). ideally, you want it to be set to the new item
+                        ProductList.SelectedValue = ProductID.Text; //or newProductID.ToString(), but this text string is better
+
+                    }
+
+
+                }
+                catch(Exception ex)
+                {
+                    errormsgs.Add(GetInnerException(ex).ToString());
+                    LoadMessageDisplay(errormsgs, "alert alert-danger");
+                }
+                catch (DbUpdateException ex)
+                {
+                    UpdateException updateException = (UpdateException)ex.InnerException;
+                    if (updateException.InnerException != null)
+                    {
+                        errormsgs.Add(updateException.InnerException.Message.ToString());
+                    }
+                    else
+                    {
+                        errormsgs.Add(updateException.Message);
+                    }
+                    LoadMessageDisplay(errormsgs, "alert alert-danger");
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    foreach (var entityValidationErrors in ex.EntityValidationErrors)
+                    {
+                        foreach (var validationError in entityValidationErrors.ValidationErrors)
+                        {
+                            errormsgs.Add(validationError.ErrorMessage);
+                        }
+                    }
+                    LoadMessageDisplay(errormsgs, "alert alert-danger");
+                }
+                catch (Exception ex)
+                {
+                    errormsgs.Add(GetInnerException(ex).ToString());
+                    LoadMessageDisplay(errormsgs, "alert alert-danger");
+                }
+
+            }
+
+        }
+
+        protected void UpdateProduct_Click(object sender, EventArgs e)
+        {
+            //recheck validation
+            if (Page.IsValid)
+            {
+                //check any event code validation
+
+                try
+                {
+                    //examples:
+                    //e.x.1 assume that the category ID is required
+                    if (CategoryList.SelectedIndex == 0) //still on prompt
+                    {
+                        errormsgs.Add("No category selected.");
+                    }
+                    //e.x.2 check the string length of QuantityPerUnit
+                    if (QuantityPerUnit.Text.Length > 20)
+                    {
+                        errormsgs.Add("QuantityPerUnit is limited to 20 characters.");
+                    }
+                    //  On update ensure you have your PK
+                    int productid = 0;
+                    if (string.IsNullOrEmpty(ProductID.Text))
+                    {
+                        errormsgs.Add("Product ID is invalid.");
+                    }
+                    else if (!int.TryParse(ProductID.Text, out productid))
+                    {
+                        errormsgs.Add("Product ID is invalid.");
+                    }
+                    else if (productid < 1)
+                    {
+                        errormsgs.Add("Product ID is invalid.");
+                    }
+                    
+                    //  Is data still good?
+                    if (errormsgs.Count > 0)
+                    {
+                        LoadMessageDisplay(errormsgs, "alert alert-info");
+                    }
+                    else
+                    {
+                        //assume at this point, the data is good! you are ready for processing
+
+                        //Standard Add Pattern:
+                        //1) connect to the controller
+                        ProductController sysmgr = new ProductController();
+
+                        //2) create and load an instance of the entity
+                        //      since there was no constructor placed in the entity, 
+                        //      when one creates the instance the default system constructor will be used
+                        Product item = new Product();
+                        item.ProductID = productid;
+                        //  NOTE: item name isn't important, can be anything
+                        //  NOTE: since the ProductID is an identity field it does NOT need to be loaded into the new instance
+                        item.ProductName = ProductName.Text.Trim();
+                        //      trim removes accidental spaces
+                        //  E.X. the long way of dealing with nullable numerics
+                        if (CategoryList.SelectedIndex == 0)
+                        {
+                            item.CategoryID = null;
+                        }
+                        else
+                        {
+                            item.CategoryID = int.Parse(CategoryList.SelectedValue);
+                        }
+
+                        //  E.X. the short way of dealing with nullable numerics
+                        item.SupplierID =
+                            SupplierList.SelectedIndex == 0 ? (int?)null : int.Parse(SupplierList.SelectedValue);
+                        item.QuantityPerUnit =
+                            string.IsNullOrEmpty(QuantityPerUnit.Text) ? null : QuantityPerUnit.Text;
+                        item.UnitPrice =
+                            string.IsNullOrEmpty(UnitPrice.Text) ? (decimal?)null : decimal.Parse(UnitPrice.Text);
+                        item.UnitsInStock =
+                            string.IsNullOrEmpty(UnitsInStock.Text) ? (Int16?)null : Int16.Parse(UnitsInStock.Text);
+                        item.UnitsOnOrder =
+                            string.IsNullOrEmpty(UnitsOnOrder.Text) ? (Int16?)null : Int16.Parse(UnitsOnOrder.Text);
+                        item.ReorderLevel =
+                            string.IsNullOrEmpty(ReorderLevel.Text) ? (Int16?)null : Int16.Parse(ReorderLevel.Text);
+                        //for an update, you will want to take the current value of discontinued
+                        item.Discontinued = Discontinued.Checked;
+
+
+                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~THIS IS WHERE I GOT LOST YOOOOOOOOOOOOOOOOOOOOOOOOO~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                        //3) issue the BLL call 
+                        int newProductID = sysmgr.Products_Add(item);
+
+                        //4) give feedback
+                        //      if you get to execute the feedback code, it means that the product has been sucessfully added to  the db
+                        ProductID.Text = newProductID.ToString();
+                        errormsgs.Add("Product has been added.");
+                        LoadMessageDisplay(errormsgs, "alert alert-danger");
+                        //      is there any other controls on the form that need to be refreshed?
+                        //      you want the new product item to be added to the list!
+                        BindProductList();
+                        //  NOTE: by default, List will be at index 0 (the prompt). ideally, you want it to be set to the new item
+                        ProductList.SelectedValue = ProductID.Text; //or newProductID.ToString(), but this text string is better
+
+                    }
+
+
+                }
+                catch (Exception ex)
+                {
+                    errormsgs.Add(GetInnerException(ex).ToString());
+                    LoadMessageDisplay(errormsgs, "alert alert-danger");
+                }
+                catch (DbUpdateException ex)
+                {
+                    UpdateException updateException = (UpdateException)ex.InnerException;
+                    if (updateException.InnerException != null)
+                    {
+                        errormsgs.Add(updateException.InnerException.Message.ToString());
+                    }
+                    else
+                    {
+                        errormsgs.Add(updateException.Message);
+                    }
+                    LoadMessageDisplay(errormsgs, "alert alert-danger");
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    foreach (var entityValidationErrors in ex.EntityValidationErrors)
+                    {
+                        foreach (var validationError in entityValidationErrors.ValidationErrors)
+                        {
+                            errormsgs.Add(validationError.ErrorMessage);
+                        }
+                    }
+                    LoadMessageDisplay(errormsgs, "alert alert-danger");
+                }
+                catch (Exception ex)
+                {
+                    errormsgs.Add(GetInnerException(ex).ToString());
+                    LoadMessageDisplay(errormsgs, "alert alert-danger");
+                }
+
+            }
+
+        }
+
+        protected void RemoveProduct_Click(object sender, EventArgs e)
+        {
+
         }
     }
 

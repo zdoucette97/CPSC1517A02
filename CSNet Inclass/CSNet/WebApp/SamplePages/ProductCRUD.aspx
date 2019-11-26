@@ -39,10 +39,11 @@
              <asp:DropDownList ID="ProductList" runat="server"></asp:DropDownList>&nbsp;&nbsp;
              <asp:LinkButton ID="Search" runat="server" Font-Size="X-Large" OnClick="Search_Click" >Search</asp:LinkButton>&nbsp;&nbsp;
              <asp:LinkButton ID="Clear" runat="server" Font-Size="X-Large" OnClick="Clear_Click" >Clear</asp:LinkButton>&nbsp;&nbsp;
-             <asp:LinkButton ID="AddProduct" runat="server" Font-Size="X-Large" >Add</asp:LinkButton>&nbsp;&nbsp;
-             <asp:LinkButton ID="UpdateProduct" runat="server" Font-Size="X-Large" >Update</asp:LinkButton>&nbsp;&nbsp;
-             <asp:LinkButton ID="RemoveProduct" runat="server" Font-Size="X-Large" >Remove</asp:LinkButton>&nbsp;&nbsp;
-         
+             <asp:LinkButton ID="AddProduct" runat="server" Font-Size="X-Large" OnClick="AddProduct_Click" >Add</asp:LinkButton>&nbsp;&nbsp;
+             <asp:LinkButton ID="UpdateProduct" runat="server" Font-Size="X-Large" OnClick="UpdateProduct_Click" >Update</asp:LinkButton>&nbsp;&nbsp;
+             <asp:LinkButton ID="RemoveProduct" runat="server" Font-Size="X-Large" OnClick="RemoveProduct_Click" 
+                 CausesValidation="false" OnClientClick="return confirm('Are you sure you with to delete this product.')">Remove</asp:LinkButton>&nbsp;&nbsp; 
+         <!--no validation needed for deletion-->
              <br /><br />
              <asp:DataList ID="Message" runat="server">
                 <ItemTemplate>
