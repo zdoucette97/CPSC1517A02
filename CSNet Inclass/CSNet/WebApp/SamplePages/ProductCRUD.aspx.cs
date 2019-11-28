@@ -318,35 +318,35 @@ namespace WebApp.NorthwindPages
                     errormsgs.Add(GetInnerException(ex).ToString());
                     LoadMessageDisplay(errormsgs, "alert alert-danger");
                 }
-                catch (DbUpdateException ex)
-                {
-                    UpdateException updateException = (UpdateException)ex.InnerException;
-                    if (updateException.InnerException != null)
-                    {
-                        errormsgs.Add(updateException.InnerException.Message.ToString());
-                    }
-                    else
-                    {
-                        errormsgs.Add(updateException.Message);
-                    }
-                    LoadMessageDisplay(errormsgs, "alert alert-danger");
-                }
-                catch (DbEntityValidationException ex)
-                {
-                    foreach (var entityValidationErrors in ex.EntityValidationErrors)
-                    {
-                        foreach (var validationError in entityValidationErrors.ValidationErrors)
-                        {
-                            errormsgs.Add(validationError.ErrorMessage);
-                        }
-                    }
-                    LoadMessageDisplay(errormsgs, "alert alert-danger");
-                }
-                catch (Exception ex)
-                {
-                    errormsgs.Add(GetInnerException(ex).ToString());
-                    LoadMessageDisplay(errormsgs, "alert alert-danger");
-                }
+                //catch (DbUpdateException ex)
+                //{
+                //    UpdateException updateException = (UpdateException)ex.InnerException;
+                //    if (updateException.InnerException != null)
+                //    {
+                //        errormsgs.Add(updateException.InnerException.Message.ToString());
+                //    }
+                //    else
+                //    {
+                //        errormsgs.Add(updateException.Message);
+                //    }
+                //    LoadMessageDisplay(errormsgs, "alert alert-danger");
+                //}
+                //catch (DbEntityValidationException ex)
+                //{
+                //    foreach (var entityValidationErrors in ex.EntityValidationErrors)
+                //    {
+                //        foreach (var validationError in entityValidationErrors.ValidationErrors)
+                //        {
+                //            errormsgs.Add(validationError.ErrorMessage);
+                //        }
+                //    }
+                //    LoadMessageDisplay(errormsgs, "alert alert-danger");
+                //}
+                //catch (Exception ex)
+                //{
+                //    errormsgs.Add(GetInnerException(ex).ToString());
+                //    LoadMessageDisplay(errormsgs, "alert alert-danger");
+                //}
 
             }
 
@@ -460,35 +460,35 @@ namespace WebApp.NorthwindPages
                     errormsgs.Add(GetInnerException(ex).ToString());
                     LoadMessageDisplay(errormsgs, "alert alert-danger");
                 }
-                catch (DbUpdateException ex)
-                {
-                    UpdateException updateException = (UpdateException)ex.InnerException;
-                    if (updateException.InnerException != null)
-                    {
-                        errormsgs.Add(updateException.InnerException.Message.ToString());
-                    }
-                    else
-                    {
-                        errormsgs.Add(updateException.Message);
-                    }
-                    LoadMessageDisplay(errormsgs, "alert alert-danger");
-                }
-                catch (DbEntityValidationException ex)
-                {
-                    foreach (var entityValidationErrors in ex.EntityValidationErrors)
-                    {
-                        foreach (var validationError in entityValidationErrors.ValidationErrors)
-                        {
-                            errormsgs.Add(validationError.ErrorMessage);
-                        }
-                    }
-                    LoadMessageDisplay(errormsgs, "alert alert-danger");
-                }
-                catch (Exception ex)
-                {
-                    errormsgs.Add(GetInnerException(ex).ToString());
-                    LoadMessageDisplay(errormsgs, "alert alert-danger");
-                }
+                //catch (DbUpdateException ex)
+                //{
+                //    UpdateException updateException = (UpdateException)ex.InnerException;
+                //    if (updateException.InnerException != null)
+                //    {
+                //        errormsgs.Add(updateException.InnerException.Message.ToString());
+                //    }
+                //    else
+                //    {
+                //        errormsgs.Add(updateException.Message);
+                //    }
+                //    LoadMessageDisplay(errormsgs, "alert alert-danger");
+                //}
+                //catch (DbEntityValidationException ex)
+                //{
+                //    foreach (var entityValidationErrors in ex.EntityValidationErrors)
+                //    {
+                //        foreach (var validationError in entityValidationErrors.ValidationErrors)
+                //        {
+                //            errormsgs.Add(validationError.ErrorMessage);
+                //        }
+                //    }
+                //    LoadMessageDisplay(errormsgs, "alert alert-danger");
+                //}
+                //catch (Exception ex)
+                //{
+                //    errormsgs.Add(GetInnerException(ex).ToString());
+                //    LoadMessageDisplay(errormsgs, "alert alert-danger");
+                //}
 
             }
 
